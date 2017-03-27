@@ -109,19 +109,28 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
     private BottomBarTab[] currentTabs;
 
     public BottomBar(Context context) {
-        super(context);
-        init(context, null);
+        this(context, null);
     }
 
     public BottomBar(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context, attrs);
+        this(context, attrs, 0);
     }
 
-    private void init(Context context, AttributeSet attrs) {
+    public BottomBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init(context, attrs, defStyleAttr, 0);
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    public BottomBar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        init(context, attrs, defStyleAttr, defStyleRes);
+    }
+
+    private void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         batchPropertyApplier = new BatchTabPropertyApplier(this);
 
-        populateAttributes(context, attrs);
+        populateAttributes(context, attrs, defStyleAttr, defStyleRes);
         initializeViews();
         determineInitialBackgroundColor();
 
@@ -164,13 +173,13 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
         setOutlineProvider(ViewOutlineProvider.BOUNDS);
     }
 
-    private void populateAttributes(Context context, AttributeSet attrs) {
+    private void populateAttributes(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         primaryColor = MiscUtils.getColor(getContext(), R.attr.colorPrimary);
         screenWidth = MiscUtils.getScreenWidth(getContext());
         tenDp = MiscUtils.dpToPixel(getContext(), 10);
         maxFixedItemWidth = MiscUtils.dpToPixel(getContext(), 168);
 
-        TypedArray ta = context.getTheme().obtainStyledAttributes(attrs, R.styleable.BottomBar, 0, 0);
+        TypedArray ta = context.getTheme().obtainStyledAttributes(attrs, R.styleable.BottomBar, defStyleAttr, defStyleRes);
 
         try {
             tabXmlResource = ta.getResourceId(R.styleable.BottomBar_bb_tabXmlResource, 0);
