@@ -78,6 +78,7 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
     private int titleTextAppearance;
     private Typeface titleTypeFace;
     private boolean showShadow;
+    private float shadowElevation;
 
     private View backgroundOverlay;
     private ViewGroup outerContainer;
@@ -118,15 +119,15 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
     }
 
     private void init(Context context, AttributeSet attrs) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            init21(context);
-        }
-
         batchPropertyApplier = new BatchTabPropertyApplier(this);
 
         populateAttributes(context, attrs);
         initializeViews();
         determineInitialBackgroundColor();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            init21(context);
+        }
 
         if (tabXmlResource != 0) {
             setItems(tabXmlResource);
@@ -137,11 +138,17 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
 
+        // This is so that in Pre-Lollipop devices there is a shadow BUT without pushing the content
         if (showShadow) {
             ViewGroup.LayoutParams params = getLayoutParams();
             if (params instanceof MarginLayoutParams) {
                 MarginLayoutParams layoutParams = (MarginLayoutParams) params;
-                layoutParams.setMargins(layoutParams.leftMargin, layoutParams.topMargin - MiscUtils.dpToPixel(getContext(), 4), layoutParams.rightMargin, layoutParams.bottomMargin);
+                final int shadowHeight = getResources().getDimensionPixelSize(R.dimen.bb_fake_shadow_height);
+
+                layoutParams.setMargins(layoutParams.leftMargin,
+                        layoutParams.topMargin - shadowHeight,
+                        layoutParams.rightMargin,
+                        layoutParams.bottomMargin);
                 setLayoutParams(params);
             }
         }
@@ -149,7 +156,11 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private void init21(Context context) {
-        setElevation(MiscUtils.dpToPixel(context, 8));
+        shadowElevation = getElevation();
+        shadowElevation = shadowElevation > 0
+                ? shadowElevation
+                : getResources().getDimensionPixelSize(R.dimen.bb_default_elevation);
+        setElevation(MiscUtils.dpToPixel(context, shadowElevation));
         setOutlineProvider(ViewOutlineProvider.BOUNDS);
     }
 
@@ -159,8 +170,7 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
         tenDp = MiscUtils.dpToPixel(getContext(), 10);
         maxFixedItemWidth = MiscUtils.dpToPixel(getContext(), 168);
 
-        TypedArray ta = context.getTheme().obtainStyledAttributes(
-                attrs, R.styleable.BottomBar, 0, 0);
+        TypedArray ta = context.getTheme().obtainStyledAttributes(attrs, R.styleable.BottomBar, 0, 0);
 
         try {
             tabXmlResource = ta.getResourceId(R.styleable.BottomBar_bb_tabXmlResource, 0);
