@@ -16,6 +16,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.VisibleForTesting;
 import android.support.annotation.XmlRes;
 import android.support.design.widget.CoordinatorLayout;
@@ -26,6 +27,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.view.ViewParent;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -80,7 +82,6 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
     private View backgroundOverlay;
     private ViewGroup outerContainer;
     private ViewGroup tabContainer;
-    private View shadowView;
 
     private int defaultBackgroundColor = Color.WHITE;
     private int currentBackgroundColor;
@@ -117,6 +118,10 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
     }
 
     private void init(Context context, AttributeSet attrs) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            init21(context);
+        }
+
         batchPropertyApplier = new BatchTabPropertyApplier(this);
 
         populateAttributes(context, attrs);
@@ -126,6 +131,26 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
         if (tabXmlResource != 0) {
             setItems(tabXmlResource);
         }
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+
+        if (showShadow) {
+            ViewGroup.LayoutParams params = getLayoutParams();
+            if (params instanceof MarginLayoutParams) {
+                MarginLayoutParams layoutParams = (MarginLayoutParams) params;
+                layoutParams.setMargins(layoutParams.leftMargin, layoutParams.topMargin - MiscUtils.dpToPixel(getContext(), 4), layoutParams.rightMargin, layoutParams.bottomMargin);
+                setLayoutParams(params);
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private void init21(Context context) {
+        setElevation(MiscUtils.dpToPixel(context, 8));
+        setOutlineProvider(ViewOutlineProvider.BOUNDS);
     }
 
     private void populateAttributes(Context context, AttributeSet attrs) {
@@ -196,7 +221,6 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
 
         setLayoutParams(params);
         setOrientation(isTabletMode ? HORIZONTAL : VERTICAL);
-        ViewCompat.setElevation(this, MiscUtils.dpToPixel(getContext(), 8));
 
         View rootView = inflate(getContext(),
                 isTabletMode ? R.layout.bb_bottom_bar_item_container_tablet : R.layout.bb_bottom_bar_item_container, this);
@@ -205,11 +229,6 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
         backgroundOverlay = rootView.findViewById(R.id.bb_bottom_bar_background_overlay);
         outerContainer = (ViewGroup) rootView.findViewById(R.id.bb_bottom_bar_outer_container);
         tabContainer = (ViewGroup) rootView.findViewById(R.id.bb_bottom_bar_item_container);
-        shadowView = rootView.findViewById(R.id.bb_bottom_bar_shadow);
-
-        if (!showShadow) {
-            shadowView.setVisibility(GONE);
-        }
     }
 
     private void determineInitialBackgroundColor() {
@@ -351,8 +370,6 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
             if (tabView.getParent() == null) {
                 tabContainer.addView(tabView);
             }
-
-            tabView.requestLayout();
         }
     }
 
