@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
+import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
 import android.support.annotation.Dimension;
 import android.support.annotation.NonNull;
 import android.support.annotation.Px;
@@ -35,7 +35,7 @@ import static android.support.annotation.Dimension.DP;
 class MiscUtils {
 
     @ColorInt
-    protected static int getColor(@NonNull Context context, @ColorRes int color) {
+    protected static int getColor(@NonNull Context context, @AttrRes int color) {
         TypedValue tv = new TypedValue();
         context.getTheme().resolveAttribute(color, tv, true);
         return tv.data;
