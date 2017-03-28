@@ -389,6 +389,8 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
             if (tabView.getParent() == null) {
                 tabContainer.addView(tabView);
             }
+
+            tabView.setLayoutParams(params);
         }
     }
 
