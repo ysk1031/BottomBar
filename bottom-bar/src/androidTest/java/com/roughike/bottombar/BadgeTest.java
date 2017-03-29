@@ -6,7 +6,6 @@ import android.support.test.annotation.UiThreadTest;
 import android.support.test.filters.LargeTest;
 import android.support.test.runner.AndroidJUnit4;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -89,7 +88,7 @@ public class BadgeTest {
     public void badgeRemovedProperly() {
         assertNotEquals(bottomBar.findViewById(R.id.bb_bottom_bar_item_container), nearby.getOuterView());
         assertEquals(2, nearby.getOuterView().getChildCount());
-        assertTrue(nearby.getOuterView().getChildAt(1) instanceof BottomBarBadge);
+        assertTrue(nearby.getOuterView().getChildAt(1) instanceof BottomBarBadgeView);
 
         nearby.removeBadge();
         assertNull(nearby.badge);

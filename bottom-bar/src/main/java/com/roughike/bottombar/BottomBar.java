@@ -266,6 +266,15 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
         }
     }
 
+    public void setBadgeFactory(final BadgeFactory badgeFactory) {
+        batchPropertyApplier.applyToAllTabs(new BatchTabPropertyApplier.TabPropertyUpdater() {
+            @Override
+            public void update(BottomBarTab tab) {
+                tab.setBadgeFactory(badgeFactory);
+            }
+        });
+    }
+
     /**
      * Set the items for the BottomBar from XML Resource.
      */

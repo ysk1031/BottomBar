@@ -10,14 +10,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v7.widget.AppCompatImageView;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 /*
@@ -36,7 +39,7 @@ import android.widget.TextView;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class BottomBarTab extends LinearLayout {
+public class BottomBarTab extends FrameLayout {
     @VisibleForTesting
     static final String STATE_BADGE_COUNT = "STATE_BADGE_COUNT_FOR_TAB_";
 
@@ -50,6 +53,8 @@ public class BottomBarTab extends LinearLayout {
     @VisibleForTesting
     BottomBarBadge badge;
     private Type type = Type.FIXED;
+    @IdRes
+    private int tabId;
     private int iconResId;
     private String title;
     private float inActiveAlpha;
@@ -59,12 +64,14 @@ public class BottomBarTab extends LinearLayout {
     private int barColorWhenSelected;
     private int badgeBackgroundColor;
     private boolean badgeHidesWhenActive;
+    private View tabContent;
     private AppCompatImageView iconView;
     private TextView titleView;
     private boolean isActive;
     private int indexInContainer;
     private int titleTextAppearanceResId;
     private Typeface titleTypeFace;
+    private BadgeFactory badgeFactory = new BadgeFactoryDefaultImpl();
 
     BottomBarTab(Context context) {
         super(context);
@@ -88,10 +95,10 @@ public class BottomBarTab extends LinearLayout {
 
     void prepareLayout() {
         inflate(getContext(), getLayoutResource(), this);
-        setOrientation(VERTICAL);
-        setGravity(Gravity.CENTER_HORIZONTAL);
-        setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        setLayoutParams(new BottomBar.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         setBackgroundResource(MiscUtils.getDrawableRes(getContext(), R.attr.selectableItemBackgroundBorderless));
+
+        tabContent = findViewById(R.id.bb_tab_content);
 
         iconView = (AppCompatImageView) findViewById(R.id.bb_bottom_bar_icon);
         iconView.setImageResource(iconResId);
@@ -149,6 +156,15 @@ public class BottomBarTab extends LinearLayout {
     private void updateCustomTypeface() {
         if (titleTypeFace != null && titleView != null) {
             titleView.setTypeface(titleTypeFace);
+        }
+    }
+
+    public void setBadgeFactory(BadgeFactory badgeFactory) {
+        this.badgeFactory = badgeFactory;
+        if (badge != null) {
+            final int count = badge.getCount();
+            badge = null;
+            setBadgeCount(count);
         }
     }
 
@@ -253,7 +269,7 @@ public class BottomBarTab extends LinearLayout {
         this.badgeBackgroundColor = badgeBackgroundColor;
 
         if (badge != null) {
-            badge.setColoredCircleBackground(badgeBackgroundColor);
+            badge.setBadgeColor(badgeBackgroundColor);
         }
     }
 
@@ -294,24 +310,49 @@ public class BottomBarTab extends LinearLayout {
     }
 
     public void setBadgeCount(int count) {
-        if (count <= 0) {
-            if (badge != null) {
-                badge.removeFromTab(this);
-                badge = null;
-            }
-
-            return;
-        }
-
         if (badge == null) {
-            badge = new BottomBarBadge(getContext());
-            badge.attachToTab(this, badgeBackgroundColor);
+            BottomBarBadge badge = badgeFactory.createBadge(getContext(), badgeBackgroundColor, tabId);
+            attachToTab(badge);
         }
 
         badge.setCount(count);
-
         if (isActive && badgeHidesWhenActive) {
             badge.hide();
+        }
+    }
+
+    private void attachToTab(BottomBarBadge badge) {
+        this.badge = badge;
+        addView(badge.getView());
+
+        getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @SuppressWarnings("deprecation")
+            @Override
+            public void onGlobalLayout() {
+                getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                adjustPositionAndSize();
+            }
+        });
+    }
+
+    private void adjustPositionAndSize() {
+        if (badge == null) {
+            return;
+        }
+
+        View badgeView = badge.getView();
+        final int size = Math.max(badgeView.getWidth(), badgeView.getHeight());
+        final int endOfTabX = getWidth() - (int) tabContent.getX() - tabContent.getWidth();
+        final int startOfTabY = (int) tabContent.getY();
+
+        BottomBarTab.LayoutParams params = (BottomBarTab.LayoutParams) badgeView.getLayoutParams();
+        params.gravity = Gravity.TOP | Gravity.END;
+        params.setMargins(0, startOfTabY, endOfTabX, 0);
+
+        if (params.width != size || params.height != size) {
+            params.width = size;
+            params.height = size;
+            badgeView.setLayoutParams(params);
         }
     }
 
@@ -444,11 +485,7 @@ public class BottomBarTab extends LinearLayout {
     void updateWidth(float endWidth, boolean animated) {
         if (!animated) {
             getLayoutParams().width = (int) endWidth;
-
-            if (!isActive && badge != null) {
-                badge.adjustPositionAndSize(this);
-                badge.show();
-            }
+            adjustPositionAndSize();
             return;
         }
 
@@ -469,19 +506,10 @@ public class BottomBarTab extends LinearLayout {
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (!isActive && badge != null) {
-                    badge.adjustPositionAndSize(BottomBarTab.this);
-                    badge.show();
-                }
+                adjustPositionAndSize();
             }
         });
         animator.start();
-    }
-
-    private void updateBadgePosition() {
-        if (badge != null) {
-            badge.adjustPositionAndSize(this);
-        }
     }
 
     private void setTopPaddingAnimated(int start, int end) {

@@ -10,8 +10,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Check out these samples and their sources for the most basic use cases."
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:text="Check out these samples and their sources for the most basic use cases." />
 
     <Button
         android:id="@+id/simple_three_tabs"
@@ -42,5 +42,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Using Badges" />
+
+    <Button
+        android:id="@+id/custom_badges"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Using Custom Badges" />
 
 </LinearLayout>
