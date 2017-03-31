@@ -24,6 +24,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
@@ -105,6 +106,7 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
     private boolean isComingFromRestoredState;
     private boolean ignoreTabReselectionListener;
 
+    private ShySettings shySettings;
     private boolean shyHeightAlreadyCalculated;
     private boolean navBarAccountedHeightCalculated;
 
@@ -218,8 +220,12 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
                 && NavbarUtils.shouldDrawBehindNavbar(getContext());
     }
 
-    private boolean isShy() {
+    boolean isShy() {
         return !isTabletMode && hasBehavior(BEHAVIOR_SHY);
+    }
+
+    boolean isShyHeightAlreadyCalculated() {
+        return shyHeightAlreadyCalculated;
     }
 
     private boolean isIconsOnlyMode() { return !isTabletMode && hasBehavior(BEHAVIOR_ICONS_ONLY); }
@@ -400,6 +406,24 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
 
             tabView.setLayoutParams(params);
         }
+    }
+
+    /**
+     * Returns the settings specific for a shy BottomBar.
+     *
+     * @throws UnsupportedOperationException, if this BottomBar is not shy.
+     */
+    public ShySettings getShySettings() {
+        if (!isShy()) {
+            Log.e("BottomBar", "Tried to get shy settings for a BottomBar " +
+                    "that is not shy.");
+        }
+
+        if (shySettings == null) {
+            shySettings = new ShySettings(this);
+        }
+
+        return shySettings;
     }
 
     /**
@@ -774,6 +798,7 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
 
             if (height != 0) {
                 updateShyHeight(height);
+                getShySettings().shyHeightCalculated();
                 shyHeightAlreadyCalculated = true;
             }
         }
@@ -1018,17 +1043,5 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
                         ViewCompat.setAlpha(backgroundOverlay, 1);
                     }
                 }).start();
-    }
-
-    /**
-     * Toggle translation of BottomBar to hidden and visible in a CoordinatorLayout.
-     *
-     * @param visible true resets translation to 0, false translates view to hidden
-     */
-    private void toggleShyVisibility(boolean visible) {
-        BottomNavigationBehavior<BottomBar> from = BottomNavigationBehavior.from(this);
-        if (from != null) {
-            from.setHidden(this, visible);
-        }
     }
 }
