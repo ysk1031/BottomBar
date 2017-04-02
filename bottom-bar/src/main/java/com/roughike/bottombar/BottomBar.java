@@ -78,6 +78,7 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
     private int activeTabColor;
     private int badgeBackgroundColor;
     private boolean hideBadgeWhenActive;
+    private boolean longPressHintsEnabled;
     private int titleTextAppearance;
     private Typeface titleTypeFace;
     private boolean showShadow;
@@ -198,6 +199,7 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
                     Color.WHITE : ContextCompat.getColor(context, R.color.bb_inActiveBottomBarItemColor);
             int defaultActiveColor = isShiftingMode() ? Color.WHITE : primaryColor;
 
+            longPressHintsEnabled = ta.getBoolean(R.styleable.BottomBar_bb_longPressHintsEnabled, true);
             inActiveTabColor = ta.getColor(R.styleable.BottomBar_bb_inActiveTabColor, defaultInActiveColor);
             activeTabColor = ta.getColor(R.styleable.BottomBar_bb_activeTabColor, defaultActiveColor);
             badgeBackgroundColor = ta.getColor(R.styleable.BottomBar_bb_badgeBackgroundColor, Color.RED);
@@ -609,6 +611,17 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
     }
 
     /**
+     * Controls whether the long pressed tab title should be displayed in
+     * a helpful Toast if the title is not currently visible.
+     *
+     * @param enabled true if toasts should be shown to indicate the title
+     *                of a long pressed tab, false otherwise.
+     */
+    public void setLongPressHintsEnabled(boolean enabled) {
+        longPressHintsEnabled = enabled;
+    }
+
+    /**
      * Set alpha value used for inactive BottomBarTabs.
      */
     public void setInActiveTabAlpha(float alpha) {
@@ -905,7 +918,13 @@ public class BottomBar extends LinearLayout implements View.OnClickListener, Vie
     }
 
     private boolean handleLongClick(BottomBarTab longClickedTab) {
-        if ((isShiftingMode() || isTabletMode) && !longClickedTab.isActive()) {
+        boolean areInactiveTitlesHidden = isShiftingMode() || isTabletMode;
+        boolean isClickedTitleHidden = !longClickedTab.isActive();
+        boolean shouldShowHint = areInactiveTitlesHidden
+                && isClickedTitleHidden
+                && longPressHintsEnabled;
+
+        if (shouldShowHint) {
             Toast.makeText(getContext(), longClickedTab.getTitle(), Toast.LENGTH_SHORT).show();
         }
 
