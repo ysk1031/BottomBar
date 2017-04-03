@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="bb_height">56dp</dimen>
+    <dimen name="bb_tab_internal_padding_sides">12dp</dimen>
+    <dimen name="bb_tab_internal_padding_top">6dp</dimen>
+    <dimen name="bb_tab_internal_padding_top_inactive">8dp</dimen>
+    <dimen name="bb_tab_internal_padding_bottom">10dp</dimen>
+    <dimen name="bb_tab_badge_margin_from_center">16dp</dimen>
+    <dimen name="bb_tab_badge_margin_from_top">2dp</dimen>
+    <dimen name="bb_tab_icon_size">24dp</dimen>
+    <dimen name="bb_tab_badge_size">16dp</dimen>
     <dimen name="bb_default_elevation">8dp</dimen>
     <dimen name="bb_fake_shadow_height">4dp</dimen>
 </resources>

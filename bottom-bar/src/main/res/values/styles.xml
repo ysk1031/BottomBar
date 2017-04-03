@@ -15,6 +15,9 @@
         <item name="android:gravity">center_horizontal</item>
     </style>
 
+    <style name="BB_BottomBarItem_Badge" parent="TextAppearance.AppCompat.Caption">
+    </style>
+
     <style name="BB_BottomBarItem_Fixed.TitleAppearance" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textSize">14sp</item>
     </style>
