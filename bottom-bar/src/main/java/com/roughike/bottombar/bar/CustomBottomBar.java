@@ -2,7 +2,9 @@ package com.roughike.bottombar.bar;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -49,7 +51,7 @@ public class CustomBottomBar extends FrameLayout {
     private boolean showShadow;
 
     @ColorInt
-    private int defaultBackgroundColor;
+    private int defaultBackgroundColor = Color.WHITE;
 
     @ColorInt
     private int primaryColor;
@@ -203,6 +205,15 @@ public class CustomBottomBar extends FrameLayout {
         setTabs(xmlRes, null);
     }
 
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
+        Paint paint = new Paint();
+        paint.setColor(defaultBackgroundColor);
+        paint.setStyle(Paint.Style.FILL);
+        canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
+        super.dispatchDraw(canvas);
+    }
+
     /**
      * Set the item for the BottomBar from XML Resource with a default configuration
      * for each tab.
@@ -248,6 +259,7 @@ public class CustomBottomBar extends FrameLayout {
                                             .badgeBackgroundColor(badgeBackgroundColor)
                                             .hideBadgeWhenSelected(hideBadgeWhenActive)
                                             .titleTextAppearance(titleTextAppearance)
+                                            .behavior(behaviors)
                                             .titleTypeFace(titleTypeFace)
                                             .build();
     }

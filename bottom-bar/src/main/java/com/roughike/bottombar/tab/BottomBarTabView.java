@@ -9,7 +9,6 @@ import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.FloatRange;
-import android.support.annotation.IdRes;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +17,7 @@ import android.support.annotation.StyleRes;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
+import com.roughike.bottombar.bar.BottomBarBehavior;
 import com.roughike.bottombar.bar.BottomBarConfig;
 
 /**
@@ -25,6 +25,9 @@ import com.roughike.bottombar.bar.BottomBarConfig;
  */
 
 public abstract class BottomBarTabView extends FrameLayout {
+    @BottomBarBehavior
+    private int behaviors;
+
     @ColorInt
     private int barColorWhenSelected;
 
@@ -70,8 +73,19 @@ public abstract class BottomBarTabView extends FrameLayout {
 
         updateTextAppearance(config.titleTextAppearance);
 
+        updateBehavior(config.behavior);
+
         if (config.titleTypeFace != null) {
             updateTypeface(config.titleTypeFace);
+        }
+    }
+
+    private void updateBehavior(@BottomBarBehavior int behavior) {
+        this.behaviors = behavior;
+        if (isBehaviorActive(BottomBarBehavior.ICONS_ONLY) || isBehaviorActive(BottomBarBehavior.TABLET_MODE)) {
+            displayIconOnly();
+        } else {
+            displayAllContent();
         }
     }
 
@@ -108,6 +122,10 @@ public abstract class BottomBarTabView extends FrameLayout {
         this.barColorWhenSelected = savedState.barColorWhenSelected;
     }
 
+    private boolean isBehaviorActive(@BottomBarBehavior int behavior) {
+        return (behaviors & behavior) == behavior;
+    }
+
     public abstract void updateIcon(@DrawableRes int iconResId);
 
     public abstract void updateTitle(@NonNull String title);
@@ -124,7 +142,7 @@ public abstract class BottomBarTabView extends FrameLayout {
 
     public abstract void updateInactiveAlpha(@FloatRange(from = 0, to = 1f) float alpha);
 
-    public abstract void updateTextAppearance(@IdRes int textAppearanceResId);
+    public abstract void updateTextAppearance(@StyleRes int textAppearanceResId);
 
     public abstract void updateTypeface(@NonNull Typeface typeface);
 

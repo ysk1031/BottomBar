@@ -3,12 +3,14 @@ package com.roughike.bottombar.bar;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.Dimension;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.Px;
@@ -35,12 +37,13 @@ import static android.support.annotation.Dimension.DP;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-class MiscUtils {
+public class MiscUtils {
 
     @NonNull
     protected static TypedValue getTypedValue(@NonNull Context context, @AttrRes int resId) {
         TypedValue tv = new TypedValue();
-        context.getTheme().resolveAttribute(resId, tv, true);
+        context.getTheme()
+               .resolveAttribute(resId, tv, true);
         return tv;
     }
 
@@ -80,7 +83,8 @@ class MiscUtils {
      * @return dimension in dps
      */
     protected static int pixelToDp(@NonNull Context context, @Px int px) {
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        DisplayMetrics displayMetrics = context.getResources()
+                                               .getDisplayMetrics();
         return Math.round(px / displayMetrics.density);
     }
 
@@ -91,7 +95,8 @@ class MiscUtils {
      * @return screen width
      */
     protected static int getScreenWidth(@NonNull Context context) {
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        DisplayMetrics displayMetrics = context.getResources()
+                                               .getDisplayMetrics();
         return (int) (displayMetrics.widthPixels / displayMetrics.density);
     }
 
@@ -117,9 +122,16 @@ class MiscUtils {
      * @return true if the night mode is enabled, otherwise false.
      */
     protected static boolean isNightMode(@NonNull Context context) {
-        int currentNightMode = context.getResources().getConfiguration().uiMode
+        int currentNightMode = context.getResources()
+                                      .getConfiguration().uiMode
                 & Configuration.UI_MODE_NIGHT_MASK;
         return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    @ColorInt
+    public static int applyAlpahToColor(@ColorInt int color, @FloatRange(from = 0, to = 1) float alpha) {
+        int alphaInt = (int) ((float) 0xFF * alpha);
+        return (alphaInt << 24) | (0x00FFFFFF & color);
     }
 
     /**

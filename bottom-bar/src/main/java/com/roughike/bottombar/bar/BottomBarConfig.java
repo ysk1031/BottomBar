@@ -5,6 +5,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
+import android.support.annotation.StyleRes;
 
 /**
  * Created by joragu on 4/2/2017.
@@ -30,8 +31,11 @@ public class BottomBarConfig {
     @ColorInt
     public final int badgeBackgroundColor;
 
-    @IdRes
+    @StyleRes
     public final int titleTextAppearance;
+
+    @BottomBarBehavior
+    public final int behavior;
 
     @Nullable
     public final Typeface titleTypeFace;
@@ -47,6 +51,7 @@ public class BottomBarConfig {
         this.badgeBackgroundColor = builder.badgeBackgroundColor;
         this.badgeHidesWhenSelected = builder.hidesBadgeWhenSelected;
         this.titleTextAppearance = builder.titleTextAppearance;
+        this.behavior = builder.behavior;
         this.titleTypeFace = builder.titleTypeFace;
     }
 
@@ -60,6 +65,7 @@ public class BottomBarConfig {
         private int badgeBackgroundColor;
         private boolean hidesBadgeWhenSelected = true;
         private int titleTextAppearance;
+        private int behavior;
         private Typeface titleTypeFace;
 
         public Builder inActiveTabAlpha(float alpha) {
@@ -97,8 +103,13 @@ public class BottomBarConfig {
             return this;
         }
 
-        public Builder titleTextAppearance(int titleTextAppearance) {
+        public Builder titleTextAppearance(@StyleRes int titleTextAppearance) {
             this.titleTextAppearance = titleTextAppearance;
+            return this;
+        }
+
+        public Builder behavior(@BottomBarBehavior int behavior) {
+            this.behavior = behavior;
             return this;
         }
 

@@ -7,18 +7,18 @@ import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.FloatRange;
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.annotation.StyleRes;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.AppCompatImageView;
+import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.roughike.bottombar.R;
+import com.roughike.bottombar.bar.MiscUtils;
 
 /**
  * Created by joragu on 4/2/2017.
@@ -49,8 +49,8 @@ public class BottomBarDefaultTabView extends BottomBarTabView {
     @ColorInt
     private int badgeBackgroundColor;
 
-    @IdRes
-    private int titleTextAppearanceResId;
+    @StyleRes
+    private int textAppearanceResId;
 
     @DrawableRes
     private int iconResId;
@@ -62,14 +62,16 @@ public class BottomBarDefaultTabView extends BottomBarTabView {
 
     private boolean badgeHidesWhenActive;
 
-    private TextView titleView;
-
-    private ImageView iconView;
-
-    private TextView badgeView;
-
     @Nullable
     private Typeface titleTypeFace;
+
+    private boolean selectedTab;
+
+    private AppCompatTextView titleView;
+
+    private AppCompatImageView iconView;
+
+    private AppCompatTextView badgeView;
 
     public BottomBarDefaultTabView(@NonNull Context context) {
         this(context, null);
@@ -94,18 +96,20 @@ public class BottomBarDefaultTabView extends BottomBarTabView {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         layoutInflater.inflate(R.layout.bb_bottom_bar_tab, this, true);
 
-        titleView = (TextView) findViewById(R.id.bb_bottom_bar_tab_title);
-        iconView = (ImageView) findViewById(R.id.bb_bottom_bar_tab_icon);
-        badgeView = (TextView) findViewById(R.id.bb_bottom_bar_tab_badge);
+        titleView = (AppCompatTextView) findViewById(R.id.bb_bottom_bar_tab_title);
+        iconView = (AppCompatImageView) findViewById(R.id.bb_bottom_bar_tab_icon);
+        badgeView = (AppCompatTextView) findViewById(R.id.bb_bottom_bar_tab_badge);
     }
 
     @Override
     public void updateIcon(@DrawableRes int iconResId) {
+        this.iconResId = iconResId;
         iconView.setImageDrawable(ContextCompat.getDrawable(getContext(), iconResId));
     }
 
     @Override
     public void updateTitle(@NonNull String title) {
+        this.title = title;
         titleView.setText(title);
     }
 
@@ -121,32 +125,54 @@ public class BottomBarDefaultTabView extends BottomBarTabView {
 
     @Override
     public void updateColor(@ColorInt int color) {
-
-    }
-
-    @Override
-    public void updateAlpha(@FloatRange(from = 0, to = 1f) float alpha) {
-
+        activeColor = color;
+        updateColors();
     }
 
     @Override
     public void updateInactiveColor(@ColorInt int color) {
+        inactiveColor = color;
+        updateColors();
+    }
 
+    @Override
+    public void updateAlpha(@FloatRange(from = 0, to = 1f) float alpha) {
+        activeAlpha = alpha;
+        updateColors();
     }
 
     @Override
     public void updateInactiveAlpha(@FloatRange(from = 0, to = 1f) float alpha) {
+        inActiveAlpha = alpha;
+        updateColors();
+    }
 
+    private void updateColors() {
+        if (selectedTab) {
+            final int colorActiveWithAlpha = MiscUtils.applyAlpahToColor(activeColor, activeAlpha);
+            iconView.setColorFilter(colorActiveWithAlpha);
+            titleView.setTextColor(colorActiveWithAlpha);
+        } else {
+            final int colorInactiveWithAlpha = MiscUtils.applyAlpahToColor(inactiveColor, activeAlpha);
+            iconView.setColorFilter(colorInactiveWithAlpha);
+            titleView.setTextColor(colorInactiveWithAlpha);
+        }
     }
 
     @Override
-    public void updateTextAppearance(@IdRes int textAppearanceResId) {
+    public void updateTextAppearance(@StyleRes int textAppearanceResId) {
+        if (titleView == null || textAppearanceResId == 0 || textAppearanceResId == this.textAppearanceResId) {
+            return;
+        }
 
+        this.textAppearanceResId = textAppearanceResId;
+        titleView.setTextAppearance(getContext(), textAppearanceResId);
+        titleView.setTag(R.id.bb_bottom_bar_appearance_id, textAppearanceResId);
     }
 
     @Override
     public void updateTypeface(@NonNull Typeface typeface) {
-
+        titleView.setTypeface(titleTypeFace);
     }
 
     @Override
