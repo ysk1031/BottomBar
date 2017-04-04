@@ -9,6 +9,16 @@
                 tools:layout_height="@dimen/bb_height"
                 tools:layout_width="140dp">
 
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/bb_bottom_bar_tab_title"
+        style="@style/BB_BottomBarItem_TitleStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingBottom="@dimen/bb_tab_internal_padding_bottom"
+        android:textAppearance="@style/BB_BottomBarItem_Fixed.TitleAppearance"
+        tools:text="Title"/>
+
     <android.support.v7.widget.AppCompatImageView
         android:id="@+id/bb_bottom_bar_tab_icon"
         android:layout_width="@dimen/bb_tab_icon_size"
@@ -16,17 +26,8 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/bb_tab_internal_padding_top"
+        android:scaleType="center"
         tools:src="@drawable/ic_favorites"/>
-
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/bb_bottom_bar_tab_title"
-        style="@style/BB_BottomBarItem_TitleStyle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="@dimen/bb_tab_internal_padding_bottom"
-        android:textAppearance="@style/BB_BottomBarItem_Fixed.TitleAppearance"
-        tools:text="Title"/>
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/bb_bottom_bar_tab_badge"
@@ -43,6 +44,7 @@
         android:textAppearance="@style/BB_BottomBarItem_Badge"
         android:textColor="@android:color/white"
         android:visibility="gone"
-        tools:text="99"/>
+        tools:text="99"
+        tools:visibility="visible"/>
 
 </RelativeLayout>

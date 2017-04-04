@@ -3,7 +3,6 @@ package com.roughike.bottombar.bar;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.support.annotation.AttrRes;
@@ -64,7 +63,7 @@ public class MiscUtils {
      * @param dp      dimension in dps
      * @return dimension in pixels
      */
-    protected static int dpToPixel(@NonNull Context context, @Dimension(unit = DP) float dp) {
+    public static int dpToPixel(@NonNull Context context, @Dimension(unit = DP) float dp) {
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
 

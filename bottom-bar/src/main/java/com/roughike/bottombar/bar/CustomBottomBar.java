@@ -22,7 +22,10 @@ import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.widget.FrameLayout;
 
+import com.roughike.bottombar.BottomBarTab;
 import com.roughike.bottombar.R;
+import com.roughike.bottombar.TabSelectionInterceptor;
+import com.roughike.bottombar.tab.AnimationType;
 import com.roughike.bottombar.tab.BottomBarTabView;
 
 import java.util.ArrayList;
@@ -32,10 +35,12 @@ import java.util.List;
  * Created by joragu on 4/2/2017.
  */
 
-public class CustomBottomBar extends FrameLayout {
+public class CustomBottomBar extends FrameLayout implements View.OnClickListener, View.OnLongClickListener {
     private static final float DEFAULT_INACTIVE_SHIFTING_TAB_ALPHA = 0.6f;
 
     private final List<BottomBarTabView> currentTabs = new ArrayList<>();
+
+    private int currentTabIndex = 0;
 
     @BottomBarBehavior
     private int behaviors;
@@ -49,6 +54,9 @@ public class CustomBottomBar extends FrameLayout {
     private int titleTextAppearance;
     private Typeface titleTypeFace;
     private boolean showShadow;
+
+    @Nullable
+    private TabSelectionInterceptor tabSelectionInterceptor;
 
     @ColorInt
     private int defaultBackgroundColor = Color.WHITE;
@@ -145,7 +153,10 @@ public class CustomBottomBar extends FrameLayout {
         super.onViewAdded(child);
 
         if (child instanceof BottomBarTabView) {
-            currentTabs.add((BottomBarTabView) child);
+            BottomBarTabView tab = (BottomBarTabView) child;
+            tab.setOnClickListener(this);
+            tab.setOnLongClickListener(this);
+            currentTabs.add(tab);
         } else {
             throw new IllegalArgumentException("You can only add views that extend from BottomBarTabView objects to the BottomBar");
         }
@@ -189,6 +200,22 @@ public class CustomBottomBar extends FrameLayout {
 
             tab.layout(tabStart, 0, tabEnd, height);
         }
+    }
+
+    /**
+     * Set a listener that gets fired when the selected {@link BottomBarTab} is about to change.
+     *
+     * @param interceptor a listener for potentially interrupting changes in tab selection.
+     */
+    public void setTabSelectionInterceptor(@NonNull TabSelectionInterceptor interceptor) {
+        tabSelectionInterceptor = interceptor;
+    }
+
+    /**
+     * Removes the current {@link TabSelectionInterceptor} listener
+     */
+    public void removeOverrideTabSelectionListener() {
+        tabSelectionInterceptor = null;
     }
 
     public void removeTabs() {
@@ -270,6 +297,28 @@ public class CustomBottomBar extends FrameLayout {
 
     private boolean isBehaviorActive(@BottomBarBehavior int behavior) {
         return (behaviors & behavior) == behavior;
+    }
+
+    @Override
+    public void onClick(View v) {
+        BottomBarTabView nextTab = (BottomBarTabView) v;
+        BottomBarTabView currentTab = currentTabs.get(currentTabIndex);
+
+        if (tabSelectionInterceptor != null && tabSelectionInterceptor.shouldInterceptTabSelection(currentTab.getId(), nextTab.getId())) {
+            return;
+        }
+
+        currentTab.onTabDeselected(AnimationType.WITH_ANIMATION);
+        nextTab.onTabSelected(AnimationType.WITH_ANIMATION);
+
+//        updateSelectedTab(position);
+//        shiftingMagic(oldTab, newTab, animate);
+//        handleBackgroundColorChange(newTab, animate);
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        return false;
     }
 }
 

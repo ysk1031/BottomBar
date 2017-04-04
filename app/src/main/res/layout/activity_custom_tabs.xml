@@ -14,7 +14,7 @@
     <com.roughike.bottombar.bar.CustomBottomBar
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="56dp"
         android:layout_alignParentBottom="true">
 
         <com.roughike.bottombar.tab.BottomBarDefaultTabView

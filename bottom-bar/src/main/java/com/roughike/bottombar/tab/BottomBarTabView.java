@@ -122,9 +122,13 @@ public abstract class BottomBarTabView extends FrameLayout {
         this.barColorWhenSelected = savedState.barColorWhenSelected;
     }
 
-    private boolean isBehaviorActive(@BottomBarBehavior int behavior) {
+    protected boolean isBehaviorActive(@BottomBarBehavior int behavior) {
         return (behaviors & behavior) == behavior;
     }
+
+    public abstract void onTabSelected(@AnimationType int animationType);
+
+    public abstract void onTabDeselected(@AnimationType int animationType);
 
     public abstract void updateIcon(@DrawableRes int iconResId);
 
@@ -145,6 +149,8 @@ public abstract class BottomBarTabView extends FrameLayout {
     public abstract void updateTextAppearance(@StyleRes int textAppearanceResId);
 
     public abstract void updateTypeface(@NonNull Typeface typeface);
+
+    public abstract void updateBadgeCount(int badgeCount);
 
     public abstract void showBadgeWhenActive();
 
