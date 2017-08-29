@@ -40,8 +40,8 @@ public class BottomBarTab extends LinearLayout {
 
     private static final long ANIMATION_DURATION = 150;
     private static final float ACTIVE_TITLE_SCALE = 1;
-    private static final float INACTIVE_FIXED_TITLE_SCALE = 0.86f;
-    private static final float ACTIVE_SHIFTING_TITLELESS_ICON_SCALE = 1.24f;
+    private static final float INACTIVE_FIXED_TITLE_SCALE = 1f;
+    private static final float ACTIVE_SHIFTING_TITLELESS_ICON_SCALE = 1f;
     private static final float INACTIVE_SHIFTING_TITLELESS_ICON_SCALE = 1f;
 
     private final int sixDps;
@@ -384,17 +384,17 @@ public class BottomBarTab extends LinearLayout {
     void select(boolean animate) {
         isActive = true;
 
-        if (animate) {
-            animateIcon(activeAlpha, ACTIVE_SHIFTING_TITLELESS_ICON_SCALE);
-            animateTitle(sixDps, ACTIVE_TITLE_SCALE, activeAlpha);
-            animateColors(inActiveColor, activeColor);
-        } else {
+//        if (animate) {
+//            animateIcon(activeAlpha, ACTIVE_SHIFTING_TITLELESS_ICON_SCALE);
+//            animateTitle(sixDps, ACTIVE_TITLE_SCALE, activeAlpha);
+//            animateColors(inActiveColor, activeColor);
+//        } else {
             setTitleScale(ACTIVE_TITLE_SCALE);
-            setTopPadding(sixDps);
+            setTopPadding(eightDps);
             setIconScale(ACTIVE_SHIFTING_TITLELESS_ICON_SCALE);
             setColors(activeColor);
             setAlphas(activeAlpha);
-        }
+//        }
 
         setSelected(true);
 
@@ -411,17 +411,17 @@ public class BottomBarTab extends LinearLayout {
         float titleScale = isShifting ? 0 : INACTIVE_FIXED_TITLE_SCALE;
         int iconPaddingTop = isShifting ? sixteenDps : eightDps;
 
-        if (animate) {
-            animateTitle(iconPaddingTop, titleScale, inActiveAlpha);
-            animateIcon(inActiveAlpha, INACTIVE_SHIFTING_TITLELESS_ICON_SCALE);
-            animateColors(activeColor, inActiveColor);
-        } else {
+//        if (animate) {
+//            animateTitle(iconPaddingTop, titleScale, inActiveAlpha);
+//            animateIcon(inActiveAlpha, INACTIVE_SHIFTING_TITLELESS_ICON_SCALE);
+//            animateColors(activeColor, inActiveColor);
+//        } else {
             setTitleScale(titleScale);
             setTopPadding(iconPaddingTop);
             setIconScale(INACTIVE_SHIFTING_TITLELESS_ICON_SCALE);
             setColors(inActiveColor);
             setAlphas(inActiveAlpha);
-        }
+//        }
 
         setSelected(false);
 
